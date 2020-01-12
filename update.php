@@ -1,5 +1,9 @@
 <?php namespace check;
 
-class update{
+/**
+ * 解析并替换同构常量
+ */
+abstract class update{
+
 
 }
