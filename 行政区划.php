@@ -9,9 +9,7 @@
  */
 class 行政区划{
 
-  //:r php % Y-m.php`;
-
-  const latest = "2019-11";
+  private const latest = '2019-11';//b0156095490dcb0034f9a6ac184e8318
 
   const A = [//{{{
   110000=>'北京市',
@@ -4002,17 +4000,10 @@ class 行政区划{
 
 }
 
-/**
- * 文件名必须Y-m.php
- */
-if(PHP_SAPI==='cli' && $_SERVER['argv'][0]===basename(__FILE__)){//{{{
-
-  $a = $b = $c = [];
-
-  ob_start();
-  $arr = @include $_SERVER['argv'][1];
-  ob_clean();
-  is_array($arr) or fwrite(STDERR,'Failed to open file.'.PHP_EOL) and die(123);
+/*{{{:r php % Y-m.php*
+  ini_set('error_reporting',0);
+  $arr = include $_SERVER['argv'][1];
+  is_array($arr) or die(404);
 
   foreach($arr as $k=>$v){
 
@@ -4022,35 +4013,35 @@ if(PHP_SAPI==='cli' && $_SERVER['argv'][0]===basename(__FILE__)){//{{{
     $aa0000 = substr($k,0,2)*10000;
     $aabb00 = substr($k,0,4)*100;
 
-    if($aa0000!==$k)//排除北京/天津/重庆
-      if($aabb00===$k)//排除二级结构的北京市东城区
+    if($aa0000!==$k)
+      if($aabb00===$k)
         $b[$aa0000][$k]= $v;
 
-    if($aabb00!==$k)//排除混杂在三级区当中出现的二级市自身
-      $c[isset($arr[$aabb00])?$aabb00:$aa0000][$k]= $v; //北京重庆有虚拟二级，由一级替换
+    if($aabb00!==$k)
+      $c[isset($arr[$aabb00])?$aabb00:$aa0000][$k]= $v;
 
   }
 
-  $a&&$b&&$c or fwrite(STDERR,'Failed to parse file.') and die(123);
+  $a&&$b&&$c or die(406);
+  $latest = basename($_SERVER['argv'][1],'.php');
+  $A = var_export($a,1);
+  $B = var_export($b,1);
+  $C = var_export($c,1);
+  $hash = md5($A.$B.$C);
 
-  fwrite(STDOUT,str_replace([
-    "\n  array (",
-    'array (',
-    ');',
-    "),",
-    ' => ',
-  ],[
-    '[',
-    '[//{{{',
-      '  ];//}}}',
-  '],',
-    '=>',
-  ],
-  '  const latest = "'.basename($_SERVER['argv'][1],'.php').'";'.PHP_EOL.PHP_EOL.
-  '  const A = '.var_export($a,true).';'.PHP_EOL.PHP_EOL.
-  '  private const B = '.var_export($b,true).';'.PHP_EOL.PHP_EOL.
-  '  private const C = '.var_export($c,true).';'.PHP_EOL
+  fwrite(STDOUT,str_replace(
+    ["\n  array (", 'array (', ');', "),", ' => '],
+    ['[', '[//{{{', '  ];//}}}', '],', '=>'],
+    <<<CODE
+      private const latest = '$latest';//$hash
+
+      const A = $A;
+
+      private const B = $B;
+
+      private const C = $C;
+
+    CODE
   ));
-
-}//}}}
+/*}}}*/
 
