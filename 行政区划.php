@@ -3972,21 +3972,23 @@ class 行政区划{
 
     if($birthday){
 
-      if($q===$aa0000 || $q===$aabb00) return;
+      if($q>=710000 || $q!==$aa0000 || $q!==$aabb00)
+      {
+        if($birthday >= new \Datetime(static::latest)) goto latest;
 
-      if($birthday >= new \Datetime(static::latest)) goto latest;
+        $arr = include max(new \DateTime('1985-01'),$birthday)->format('Y-m').'.php';
 
-      $arr = include max(new \DateTime('1985-01'),$birthday)->format('Y-m').'.php';
+        if(isset($arr[$q]))
+          return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));
+      }
 
-      if(isset($arr[$q]))
-      return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));
       return;
     }
 
     latest:
     switch($q){
     case $aa0000:
-      return static::B[$aa0000]??static::C[$aa0000];
+      return static::B[$aa0000]??static::C[$aa0000]??static::A[$aa0000];
     case $aabb00:
       return static::C[$aabb00];
     default:
