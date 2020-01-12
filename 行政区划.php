@@ -3980,8 +3980,6 @@ class 行政区划{
 
       $arr = include max(new \DateTime('1985-01'),$birthday)->format('Y-m').'.php';
 
-      var_dump($arr);
-
       if(isset($arr[$q]))
       return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));
       return;
