@@ -2,8 +2,6 @@
 
 /**
  * 免数据库即可查询区域代码
- * 一定要配套采集！！！直接运行本文件即可生成/更新对应类常量
- * @todo 区号变更不可能重复，但名称很可能与旧称一字之差，但仍沿用旧称，或并入括弧
  * @todo 输出前端需要的json树结构，以便客户端缓存。配合etag，分段输出下辖代码
  * @todo 前端很可能根据ip分析完整默认所在地
  */
@@ -3961,9 +3959,9 @@ class 行政区划{
   /**
    * @return 失败一律null
    * @return 传入日期，则在include数组中查找C类地址str
-   * @return 没传日期，查A类地址返回B/C类数组，查B类返回C类数组，查C类返回str
+   * @return 没传日期，查A/B类地址返回下辖数组，查C类返回str
    */
-  final static function 代码(int $q, \DateTime $birthday=null){
+  final static function 代码(int $q, \DateTime $day=null){
 
     if(strlen($q)!==6) return;
 
@@ -3974,9 +3972,9 @@ class 行政区划{
 
       if($q>=710000 || $q!==$aa0000 || $q!==$aabb00)
       {
-        if($birthday >= new \Datetime(static::latest)) goto latest;
+        if($day >= new \Datetime(static::latest)) goto latest;
 
-        $arr = include max(new \DateTime('1985-01'),$birthday)->format('Y-m').'.php';
+        $arr = include max(new \DateTime('1985-01'),$day)->format('Y-m').'.php';
 
         if(isset($arr[$q]))
           return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));

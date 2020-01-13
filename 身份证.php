@@ -21,7 +21,7 @@ class 身份证{
 
   final static function verify(string $id):bool{
 
-    if(strlen($id)!==18) return false;//行政区域代码不可能是前导零或九
+    if(strlen($id)!==18) return false;
 
     $arr = str_split($id);
     $x = array_pop($arr);
