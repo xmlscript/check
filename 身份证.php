@@ -28,7 +28,6 @@ class 身份证{
 
     if(array_filter($arr,'is_numeric')!==$arr) return false;
 
-    //优先处理节省资源的运算
     $tmp = 0;
     foreach($arr as $k=>$v)
       $tmp += $v * [7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2][$k];
