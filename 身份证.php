@@ -7,7 +7,7 @@ class 身份证{
     if(!static::verify($id)) throw new \InvalidArgumentException('身份证号码不正确');
 
     $d = new \money\birthday(substr($id,6,8));
-    $this->年龄 = $d->age();
+    $this->周岁 = $d->周岁();
     $this->生日 = $d->happy();
     $this->生肖 = $d->生肖();
     $this->星座 = $d->星座();
