@@ -3961,20 +3961,24 @@ class 行政区划{
    * @return 传入日期，则在include数组中查找C类地址str
    * @return 没传日期，查A/B类地址返回下辖数组，查C类返回str
    */
-  final static function 代码(int $q, \DateTime $day=null){
+  final static function 代码(int $q, \DateTimeImmutable $day=null){
 
     if(strlen($q)!==6) return;
 
     $aa0000 = substr($q,0,2)*10000;
     $aabb00 = substr($q,0,4)*100;
 
-    if($birthday){
+    if($day){
 
-      if($q>=710000 || $q!==$aa0000 || $q!==$aabb00)
-      {
-        if($day >= new \Datetime(static::latest)) goto latest;
+      if($q>=710000 || $q!==$aa0000 && $q!==$aabb00){
 
-        $arr = include max(new \DateTime('1985-01'),$day)->format('Y-m').'.php';
+        if($day >= new \DateTimeImmutable(static::latest)) goto latest;
+
+        $date = max(new \DateTimeImmutable('1980-01'),$day);
+
+        //FIXME 如果缺失1980-01.php内容，则死循环；但多加判断则耗费资源
+        //FIXME 极端情况下，12月需要11次才能命中
+        while(!$arr = @include $date->format('Y-m').'.php') $date = $date->modify('-1 month');
 
         if(isset($arr[$q]))
           return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));
