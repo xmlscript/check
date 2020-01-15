@@ -3976,9 +3976,20 @@ class 行政区划{
 
         $date = max(new \DateTimeImmutable('1980-01'),$day);
 
+
+        //TODO 新思路，所有snapshot文件，都与最新的一份作对比，充分减少文件尺寸
+        //TODO 然后全部合并于静态类属性
+
+        //FIXME 都不优雅！
+        $arr = @include $date->format('Y').'.php'??
+          @include $date->format('Y-m').'.php'??
+          @include $date->modify('-1 month')->format('Y-m').'.php'??
+          @include $date->modify('-2 month')->format('Y-m').'.php';
+
+
         //FIXME 如果缺失1980-01.php内容，则死循环；但多加判断则耗费资源
         //FIXME 极端情况下，12月需要11次才能命中
-        while(!$arr = @include $date->format('Y-m').'.php') $date = $date->modify('-1 month');
+        //while(!$arr = @include $date->format('Y-m').'.php') $date = $date->modify('-1 month');
 
         if(isset($arr[$q]))
           return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));
