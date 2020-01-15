@@ -2,10 +2,10 @@
 
 /**
  * 免数据库即可查询区域代码
- * @todo 输出前端需要的json树结构，以便客户端缓存。配合etag，分段输出下辖代码
- * @todo 前端很可能根据ip分析完整默认所在地
  */
 class 行政区划{
+
+  public const EXT = '.php';
 
   private const latest = '2019-11';//b0156095490dcb0034f9a6ac184e8318
 
@@ -3961,35 +3961,25 @@ class 行政区划{
    * @return 传入日期，则在include数组中查找C类地址str
    * @return 没传日期，查A/B类地址返回下辖数组，查C类返回str
    */
-  final static function 代码(int $q, \DateTimeImmutable $day=null){
+  final static function 代码(int $q, \DateTimeInterface $pubdate=null){
 
     if(strlen($q)!==6) return;
 
     $aa0000 = substr($q,0,2)*10000;
     $aabb00 = substr($q,0,4)*100;
 
-    if($day){
+    if($pubdate){
 
       if($q>=710000 || $q!==$aa0000 && $q!==$aabb00){
 
-        if($day >= new \DateTimeImmutable(static::latest)) goto latest;
+        if($pubdate >= new \DateTimeImmutable(static::latest.'-1')) goto latest;
 
-        $date = max(new \DateTimeImmutable('1980-01'),$day);
+        $pubdate = max(new \DateTimeImmutable('1984-1'),$pubdate);
 
-
-        //TODO 新思路，所有snapshot文件，都与最新的一份作对比，充分减少文件尺寸
-        //TODO 然后全部合并于静态类属性
-
-        //FIXME 都不优雅！
-        $arr = @include $date->format('Y').'.php'??
-          @include $date->format('Y-m').'.php'??
-          @include $date->modify('-1 month')->format('Y-m').'.php'??
-          @include $date->modify('-2 month')->format('Y-m').'.php';
-
-
-        //FIXME 如果缺失1980-01.php内容，则死循环；但多加判断则耗费资源
-        //FIXME 极端情况下，12月需要11次才能命中
-        //while(!$arr = @include $date->format('Y-m').'.php') $date = $date->modify('-1 month');
+        //空间换时间
+        $Y = $pubdate->format('Y');
+        $files = [-1=>$Y.static::EXT]+array_map(fn($m)=>"$Y-$m".static::EXT,range($pubdate->format('m'),1));
+        while((!$arr = @include current($files)) and next($files));
 
         if(isset($arr[$q]))
           return join(array_unique([$arr[$aa0000],$arr[$aabb00],$arr[$q]]));
@@ -4015,10 +4005,12 @@ class 行政区划{
 
 }
 
-/*{{{:r php % Y-m.php*
-  ini_set('error_reporting',0);
-  $arr = include $_SERVER['argv'][1];
-  is_array($arr) or die(404);
+/*{{{:r php % file*
+if(PHP_SAPI==='cli' && basename(__FILE__)===$_SERVER['argv'][0]){
+  isset($_SERVER['argv'][1]) or die(1);
+  stripos($_SERVER['argv'][1],\check\行政区划::EXT) or die(2);
+  $arr = @include $_SERVER['argv'][1];
+  is_array($arr) or die(4);
 
   foreach($arr as $k=>$v){
 
@@ -4037,8 +4029,8 @@ class 行政区划{
 
   }
 
-  $a&&$b&&$c or die(406);
-  $latest = basename($_SERVER['argv'][1],'.php');
+  $a&&$b&&$c or die(6);
+  $latest = basename($_SERVER['argv'][1],行政区划::EXT);
   $A = var_export($a,1);
   $B = var_export($b,1);
   $C = var_export($c,1);
@@ -4058,5 +4050,6 @@ class 行政区划{
 
     CODE
   ));
+}
 /*}}}*/
 
