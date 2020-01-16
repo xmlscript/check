@@ -16,7 +16,7 @@ class 身份证{
     $this->性别 = $id[-2]%2?'男':'女';
 
     //FIXME 凡是总有例外，尤其是2011年之前的历史数据
-    $this->地址 = 行政区划::代码(substr($id,0,6), new \DateTime(substr($id,6,8)));
+    $this->地址 = 行政区划::代码(substr($id,0,6), new \DateTimeImmutable(substr($id,6,8)));
   }
 
 
